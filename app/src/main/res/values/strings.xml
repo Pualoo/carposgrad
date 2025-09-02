@@ -1,3 +1,4 @@
 <resources>
     <string name="app_name">MyApiTest - COLOQUE O SEU NOME AQUI</string>
+    <string name="default_web_client_id">135224807314-nlvunuehttdk6454l8hamkk23njr9cks.apps.googleusercontent.com</string>
 </resources>
