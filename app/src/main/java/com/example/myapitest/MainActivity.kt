@@ -33,12 +33,17 @@ import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import androidx.lifecycle.viewmodel.compose.viewModel
 import coil.compose.AsyncImage
+import com.example.myapitest.service.RetrofitClient
+import com.example.myapitest.service.safeApiCall
 import com.example.yourapp.AuthViewModel
 import com.google.android.gms.auth.api.signin.GoogleSignIn
 import com.google.android.gms.auth.api.signin.GoogleSignInClient
 import com.google.android.gms.auth.api.signin.GoogleSignInOptions
 import com.google.android.gms.common.api.ApiException
 import com.google.firebase.auth.FirebaseUser
+import kotlinx.coroutines.CoroutineScope
+import kotlinx.coroutines.Dispatchers
+import kotlinx.coroutines.launch
 
 class MainActivity : ComponentActivity() {
 
@@ -66,35 +71,52 @@ class MainActivity : ComponentActivity() {
             }
         }
     }
+    override fun onResume() {
+        super.onResume()
+        fetchCars()
+    }
+
+    private fun setupView() {
+
+    }
+
+    private fun requestLocationPermission() {
+
+    }
+
+    private fun fetchCars() {
+        CoroutineScope(Dispatchers.IO).launch {
+            val result = safeApiCall { RetrofitClient.apiService.getCars() }
+            println(result.toString());
+        }
+    }
 }
 
 private class PhoneVisualTransformation : VisualTransformation {
     override fun filter(text: AnnotatedString): TransformedText {
-        // text.text contains only digits from onValueChange
         val digits = text.text
 
         val out = buildAnnotatedString {
             if (digits.isEmpty()) return@buildAnnotatedString
 
-            append("+") // +
-            append(digits.take(2)) // 55
+            append("+")
+            append(digits.take(2))
             if (digits.length > 2) {
-                append(" (") // +55 (
-                append(digits.substring(2).take(2)) // 11
+                append(" (")
+                append(digits.substring(2).take(2))
             }
             if (digits.length > 4) {
-                append(") ") // +55 (11)
-                append(digits.substring(4).take(5)) // 91234
+                append(") ")
+                append(digits.substring(4).take(5))
             }
             if (digits.length > 9) {
-                append("-") // +55 (11) 91234-
-                append(digits.substring(9).take(4)) // 5678
+                append("-")
+                append(digits.substring(9).take(4))
             }
         }
 
         val offsetMapping = object : OffsetMapping {
             override fun originalToTransformed(offset: Int): Int {
-                // offset in the original digit string
                 return when {
                     offset <= 2 -> offset + 1
                     offset <= 4 -> offset + 4
@@ -104,7 +126,6 @@ private class PhoneVisualTransformation : VisualTransformation {
             }
 
             override fun transformedToOriginal(offset: Int): Int {
-                // offset in the formatted string
                 return when {
                     offset <= 1 -> 0
                     offset <= 4 -> offset - 1
@@ -114,7 +135,7 @@ private class PhoneVisualTransformation : VisualTransformation {
                     offset <= 17 -> offset - 6
                     offset <= 18 -> 9
                     else -> offset - 7
-                }.coerceIn(0, digits.length) // Ensure the cursor position is always valid
+                }.coerceIn(0, digits.length)
             }
         }
         return TransformedText(out, offsetMapping)
