@@ -8,39 +8,26 @@ import androidx.activity.compose.rememberLauncherForActivityResult
 import androidx.activity.compose.setContent
 import androidx.activity.result.contract.ActivityResultContracts
 import androidx.activity.viewModels
-import androidx.compose.foundation.Image
 import androidx.compose.foundation.layout.*
-import androidx.compose.foundation.shape.CircleShape
-import androidx.compose.foundation.text.KeyboardOptions
 import androidx.compose.material3.*
 import androidx.compose.runtime.*
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
-import androidx.compose.ui.draw.clip
 import androidx.compose.ui.graphics.Color
-import androidx.compose.ui.layout.ContentScale
 import androidx.compose.ui.platform.LocalContext
-import androidx.compose.ui.res.painterResource
-import androidx.compose.ui.text.AnnotatedString
-import androidx.compose.ui.text.buildAnnotatedString
-import androidx.compose.ui.text.font.FontWeight
-import androidx.compose.ui.text.input.KeyboardType
-import androidx.compose.ui.text.input.OffsetMapping
-import androidx.compose.ui.text.input.TransformedText
-import androidx.compose.ui.text.input.VisualTransformation
-import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.unit.dp
-import androidx.compose.ui.unit.sp
 import androidx.lifecycle.viewmodel.compose.viewModel
-import coil.compose.AsyncImage
 import com.example.myapitest.service.RetrofitClient
 import com.example.myapitest.service.safeApiCall
+import com.example.myapitest.view.login.CodeInputScreen
+import com.example.myapitest.view.login.LoggedInUI
+import com.example.myapitest.view.login.PhoneInputScreen
+import com.example.myapitest.view.login.SelectionScreen
 import com.example.yourapp.AuthViewModel
 import com.google.android.gms.auth.api.signin.GoogleSignIn
 import com.google.android.gms.auth.api.signin.GoogleSignInClient
 import com.google.android.gms.auth.api.signin.GoogleSignInOptions
 import com.google.android.gms.common.api.ApiException
-import com.google.firebase.auth.FirebaseUser
 import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.launch
@@ -89,56 +76,6 @@ class MainActivity : ComponentActivity() {
             val result = safeApiCall { RetrofitClient.apiService.getCars() }
             println(result.toString());
         }
-    }
-}
-
-private class PhoneVisualTransformation : VisualTransformation {
-    override fun filter(text: AnnotatedString): TransformedText {
-        val digits = text.text
-
-        val out = buildAnnotatedString {
-            if (digits.isEmpty()) return@buildAnnotatedString
-
-            append("+")
-            append(digits.take(2))
-            if (digits.length > 2) {
-                append(" (")
-                append(digits.substring(2).take(2))
-            }
-            if (digits.length > 4) {
-                append(") ")
-                append(digits.substring(4).take(5))
-            }
-            if (digits.length > 9) {
-                append("-")
-                append(digits.substring(9).take(4))
-            }
-        }
-
-        val offsetMapping = object : OffsetMapping {
-            override fun originalToTransformed(offset: Int): Int {
-                return when {
-                    offset <= 2 -> offset + 1
-                    offset <= 4 -> offset + 4
-                    offset <= 9 -> offset + 6
-                    else -> offset + 7
-                }.coerceAtMost(out.length)
-            }
-
-            override fun transformedToOriginal(offset: Int): Int {
-                return when {
-                    offset <= 1 -> 0
-                    offset <= 4 -> offset - 1
-                    offset <= 7 -> 2
-                    offset <= 9 -> offset - 4
-                    offset <= 12 -> 4
-                    offset <= 17 -> offset - 6
-                    offset <= 18 -> 9
-                    else -> offset - 7
-                }.coerceIn(0, digits.length)
-            }
-        }
-        return TransformedText(out, offsetMapping)
     }
 }
 
@@ -236,118 +173,6 @@ fun SignInScreen(
     }
 }
 
-@Composable
-fun SelectionScreen(onGoogleClick: () -> Unit, onPhoneClick: () -> Unit) {
-    Column(horizontalAlignment = Alignment.CenterHorizontally) {
-        Text("Escolha um método de login", fontSize = 22.sp, fontWeight = FontWeight.Bold, color = Color(0xFF1E2A3B))
-        Spacer(modifier = Modifier.height(32.dp))
-        Button(
-            onClick = onGoogleClick,
-            colors = ButtonDefaults.buttonColors(containerColor = Color.White),
-            modifier = Modifier.fillMaxWidth()
-        ) {
-            Image(painter = painterResource(id = R.drawable.ic_google_logo), contentDescription = null, modifier = Modifier.size(24.dp))
-            Text("Login com Google", modifier = Modifier.padding(start = 12.dp), color = Color.DarkGray)
-        }
-        Spacer(modifier = Modifier.height(16.dp))
-        Button(
-            onClick = onPhoneClick,
-            colors = ButtonDefaults.buttonColors(containerColor = Color(0xFF4CAF50)),
-            modifier = Modifier.fillMaxWidth()
-        ) {
-            Text("Login com Telefone", color = Color.White)
-        }
-    }
-}
 
-@Composable
-fun PhoneInputScreen(
-    phoneNumber: String,
-    onPhoneNumberChange: (String) -> Unit,
-    onSendCodeClick: () -> Unit,
-    onBack: () -> Unit
-) {
-    Column(horizontalAlignment = Alignment.CenterHorizontally) {
-        Text("Login por Telefone", fontSize = 22.sp, fontWeight = FontWeight.Bold, color = Color(0xFF1E2A3B))
-        Spacer(modifier = Modifier.height(16.dp))
-        OutlinedTextField(
-            value = phoneNumber,
-            onValueChange = {
-                if (it.length <= 13) {
-                    onPhoneNumberChange(it.filter { char -> char.isDigit() })
-                }
-            },
-            label = { Text("Telefone (Ex: 5511912345678)") },
-            keyboardOptions = KeyboardOptions(keyboardType = KeyboardType.Phone),
-            modifier = Modifier.fillMaxWidth(),
-            visualTransformation = PhoneVisualTransformation()
-        )
-        Spacer(modifier = Modifier.height(16.dp))
-        Button(onClick = onSendCodeClick, modifier = Modifier.fillMaxWidth()) {
-            Text("Enviar Código")
-        }
-        TextButton(onClick = onBack) {
-            Text("Voltar")
-        }
-    }
-}
-
-@Composable
-fun CodeInputScreen(
-    verificationCode: String,
-    onVerificationCodeChange: (String) -> Unit,
-    onVerifyClick: () -> Unit,
-    onBack: () -> Unit
-) {
-    Column(horizontalAlignment = Alignment.CenterHorizontally) {
-        Text("Verificar Código", fontSize = 22.sp, fontWeight = FontWeight.Bold, color = Color(0xFF1E2A3B))
-        Spacer(modifier = Modifier.height(16.dp))
-        OutlinedTextField(
-            value = verificationCode,
-            onValueChange = onVerificationCodeChange,
-            label = { Text("Código de 6 dígitos") },
-            keyboardOptions = KeyboardOptions(keyboardType = KeyboardType.Number),
-            modifier = Modifier.fillMaxWidth()
-        )
-        Spacer(modifier = Modifier.height(16.dp))
-        Button(onClick = onVerifyClick, modifier = Modifier.fillMaxWidth()) {
-            Text("Verificar e Entrar")
-        }
-        TextButton(onClick = onBack) {
-            Text("Voltar")
-        }
-    }
-}
-
-
-@Composable
-fun LoggedInUI(user: FirebaseUser?, onSignOutClick: () -> Unit) {
-    Column(horizontalAlignment = Alignment.CenterHorizontally) {
-        Text("Logado como:", fontSize = 20.sp, color = Color(0xFF3A4A5B))
-        Spacer(modifier = Modifier.height(16.dp))
-
-        if (user?.photoUrl != null) {
-            AsyncImage(
-                model = user.photoUrl,
-                contentDescription = "Foto de Perfil",
-                modifier = Modifier.size(100.dp).clip(CircleShape),
-                contentScale = ContentScale.Crop
-            )
-        } else {
-            Box(modifier = Modifier.size(100.dp).clip(CircleShape).padding(8.dp)) {
-                Text("📱", fontSize = 60.sp, textAlign = TextAlign.Center)
-            }
-        }
-
-        Spacer(modifier = Modifier.height(16.dp))
-        Text(user?.displayName ?: user?.phoneNumber ?: "Usuário", fontSize = 22.sp, fontWeight = FontWeight.Bold)
-        Text(user?.email ?: "", fontSize = 16.sp, color = Color.Gray)
-        Text("UID: ${user?.uid}", fontSize = 12.sp, color = Color.Gray)
-        Spacer(modifier = Modifier.height(32.dp))
-        Button(onClick = onSignOutClick, colors = ButtonDefaults.buttonColors(containerColor = Color(0xFFE53935))) {
-            Text("Sair (Sign Out)", color = Color.White)
-        }
-    }
-}
 
 
