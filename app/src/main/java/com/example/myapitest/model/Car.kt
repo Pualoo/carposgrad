@@ -6,9 +6,10 @@ data class Place(
 )
 
 data class Car(
+    val id: String? = null,
     val imageUrl: String,
-    val year: String,
     val name: String,
+    val year: String,
     val license: String,
     val place: Place
 )

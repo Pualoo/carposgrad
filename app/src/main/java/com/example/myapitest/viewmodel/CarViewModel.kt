@@ -39,4 +39,17 @@ class CarViewModel : ViewModel() {
             }
         }
     }
+
+    fun addCar(car: Car, onSuccess: () -> Unit) {
+        viewModelScope.launch {
+            when (val result = safeApiCall { RetrofitClient.apiService.addCar(car) }) {
+                is Result.Success -> {
+                    onSuccess()
+                }
+                is Result.Error -> {
+                    _uiState.value = CarUIState.Error(result.message)
+                }
+            }
+        }
+    }
 }
