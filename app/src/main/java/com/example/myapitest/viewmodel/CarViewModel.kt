@@ -10,19 +10,31 @@ import kotlinx.coroutines.flow.StateFlow
 import kotlinx.coroutines.launch
 import com.example.myapitest.service.Result
 
+sealed class CarUIState {
+    object Loading : CarUIState()
+    data class Success(val cars: List<Car>) : CarUIState()
+    object Empty : CarUIState()
+    data class Error(val message: String) : CarUIState()
+}
+
 class CarViewModel : ViewModel() {
 
-    private val _cars = MutableStateFlow<List<Car>>(emptyList())
-    val cars: StateFlow<List<Car>> = _cars
+    private val _uiState = MutableStateFlow<CarUIState>(CarUIState.Loading)
+    val uiState: StateFlow<CarUIState> = _uiState
 
     fun fetchCars() {
         viewModelScope.launch {
+            _uiState.value = CarUIState.Loading
             when (val result = safeApiCall { RetrofitClient.apiService.getCars() }) {
                 is Result.Success -> {
-                    _cars.value = result.data
+                    if (result.data.isEmpty()) {
+                        _uiState.value = CarUIState.Empty
+                    } else {
+                        _uiState.value = CarUIState.Success(result.data)
+                    }
                 }
                 is Result.Error -> {
-                    // Handle error
+                    _uiState.value = CarUIState.Error(result.message)
                 }
             }
         }
