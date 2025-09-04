@@ -18,7 +18,6 @@ import androidx.compose.ui.unit.dp
 import androidx.lifecycle.viewmodel.compose.viewModel
 import com.example.myapitest.AuthViewModel
 import com.example.myapitest.view.dashboard.Dashboard
-import com.example.myapitest.viewmodel.CarViewModel
 import com.google.android.gms.auth.api.signin.GoogleSignIn
 import com.google.android.gms.auth.api.signin.GoogleSignInClient
 import com.google.android.gms.common.api.ApiException
@@ -26,12 +25,10 @@ import com.google.android.gms.common.api.ApiException
 @Composable
 fun LoginFlow(
     authViewModel: AuthViewModel = viewModel(),
-    carViewModel: CarViewModel = viewModel(),
     googleSignInClient: GoogleSignInClient,
     activity: Activity
 ) {
     val user by authViewModel.user.collectAsState()
-    val cars by carViewModel.cars.collectAsState()
     val context = LocalContext.current
 
     var currentScreen by remember { mutableStateOf("Selection") }
@@ -39,12 +36,6 @@ fun LoginFlow(
     var verificationCode by remember { mutableStateOf("") }
     var verificationId by remember { mutableStateOf<String?>(null) }
     var isLoading by remember { mutableStateOf(false) }
-
-    LaunchedEffect(user) {
-        if (user != null) {
-            carViewModel.fetchCars()
-        }
-    }
 
     val googleAuthLauncher = rememberLauncherForActivityResult(
         contract = ActivityResultContracts.StartActivityForResult()
@@ -118,7 +109,6 @@ fun LoginFlow(
             }
         } else {
             Dashboard(
-                cars = cars,
                 userInfo = user?.email ?: user?.phoneNumber,
                 onAddClick = { /* TODO: Handle add car */ },
                 onLogoutClick = { authViewModel.signOut(googleSignInClient) {} }
