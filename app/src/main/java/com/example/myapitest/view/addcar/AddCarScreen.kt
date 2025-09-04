@@ -25,6 +25,7 @@ import com.example.myapitest.model.Car
 import com.example.myapitest.model.Place
 import com.example.myapitest.viewmodel.CarUIState
 import com.example.myapitest.viewmodel.CarViewModel
+import java.util.UUID
 
 @Composable
 fun AddCarScreen(navController: NavController, carViewModel: CarViewModel) {
@@ -63,10 +64,11 @@ fun AddCarScreen(navController: NavController, carViewModel: CarViewModel) {
         Button(
             onClick = {
                 val newCar = Car(
+                    id = UUID.randomUUID().toString(),
                     imageUrl = "https://portalsolar-images.s3.us-east-2.amazonaws.com/institucional-and-info-production/images/102e6ad1-371b-495e-bc0a-8b1c12b8bb76/byd-lanca-carro-eletrico-mais-barato-do-brasil-POST.jpg",
                     year = year,
                     name = name,
-                    license = licence,
+                    licence = licence,
                     place = Place(lat = 0.0, long = 0.0)
                 )
                 carViewModel.addCar(newCar) {

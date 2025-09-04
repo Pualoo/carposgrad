@@ -34,7 +34,7 @@ fun CarItemView(car: Car) {
         Column {
             Text(text = car.name)
             Text(text = car.year)
-            Text(text = car.license)
+            Text(text = car.licence)
         }
     }
 }
