@@ -8,6 +8,7 @@ import com.example.myapitest.service.safeApiCall
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.StateFlow
 import kotlinx.coroutines.launch
+import com.example.myapitest.service.Result
 
 class CarViewModel : ViewModel() {
 
@@ -16,9 +17,13 @@ class CarViewModel : ViewModel() {
 
     fun fetchCars() {
         viewModelScope.launch {
-            val result = safeApiCall { RetrofitClient.apiService.getCars() }
-            if (result != null) {
-                _cars.value = result
+            when (val result = safeApiCall { RetrofitClient.apiService.getCars() }) {
+                is Result.Success -> {
+                    _cars.value = result.data
+                }
+                is Result.Error -> {
+                    // Handle error
+                }
             }
         }
     }

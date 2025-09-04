@@ -1,4 +1,4 @@
-package com.example.yourapp
+package com.example.myapitest
 
 import android.app.Activity
 import androidx.lifecycle.ViewModel
