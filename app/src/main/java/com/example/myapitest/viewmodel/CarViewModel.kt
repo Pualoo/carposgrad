@@ -2,7 +2,7 @@ package com.example.myapitest.viewmodel
 
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
-import com.example.myapitest.model.Car
+import com.example.myapitest.model.CarModel
 import com.example.myapitest.service.RetrofitClient
 import com.example.myapitest.service.safeApiCall
 import kotlinx.coroutines.flow.MutableStateFlow
@@ -12,7 +12,7 @@ import com.example.myapitest.service.Result
 
 sealed class CarUIState {
     object Loading : CarUIState()
-    data class Success(val cars: List<Car>) : CarUIState()
+    data class Success(val carModels: List<CarModel>) : CarUIState()
     object Empty : CarUIState()
     data class Error(val message: String) : CarUIState()
 }
@@ -40,9 +40,9 @@ class CarViewModel : ViewModel() {
         }
     }
 
-    fun addCar(car: Car, onSuccess: () -> Unit) {
+    fun addCar(carModel: CarModel, onSuccess: () -> Unit) {
         viewModelScope.launch {
-            when (val result = safeApiCall { RetrofitClient.apiService.addCar(car) }) {
+            when (val result = safeApiCall { RetrofitClient.apiService.addCar(carModel) }) {
                 is Result.Success -> {
                     onSuccess()
                 }

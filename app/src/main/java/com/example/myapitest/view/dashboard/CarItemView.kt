@@ -15,10 +15,10 @@ import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.unit.dp
 import coil.compose.rememberAsyncImagePainter
-import com.example.myapitest.model.Car
+import com.example.myapitest.model.CarModel
 
 @Composable
-fun CarItemView(car: Car) {
+fun CarItemView(carModel: CarModel) {
     Row(
         modifier = Modifier
             .fillMaxWidth()
@@ -26,15 +26,15 @@ fun CarItemView(car: Car) {
         verticalAlignment = Alignment.CenterVertically
     ) {
         Image(
-            painter = rememberAsyncImagePainter(model = car.imageUrl),
+            painter = rememberAsyncImagePainter(model = carModel.imageUrl),
             contentDescription = "Car Image",
             modifier = Modifier.size(60.dp)
         )
         Spacer(modifier = Modifier.width(16.dp))
         Column {
-            Text(text = car.name)
-            Text(text = car.year)
-            Text(text = car.licence)
+            Text(text = carModel.name)
+            Text(text = carModel.year)
+            Text(text = carModel.licence)
         }
     }
 }

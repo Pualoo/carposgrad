@@ -74,7 +74,7 @@ fun Dashboard(
                 }
                 is CarUIState.Success -> {
                     LazyColumn {
-                        items(state.cars) { car ->
+                        items(state.carModels) { car ->
                             CarItemView(car)
                         }
                     }

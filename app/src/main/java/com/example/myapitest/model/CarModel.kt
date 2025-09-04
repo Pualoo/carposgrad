@@ -7,7 +7,7 @@ data class Place(
     @SerializedName("long") val long: Double
 )
 
-data class Car(
+data class CarModel(
     @SerializedName("id") val id: String,
     @SerializedName("imageUrl") val imageUrl: String,
     @SerializedName("year") val year: String,
