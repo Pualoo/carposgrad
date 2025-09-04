@@ -1,5 +1,6 @@
 package com.example.myapitest.service
 
+import android.util.Log
 import retrofit2.HttpException
 
 sealed class Result<out T> {
@@ -11,12 +12,13 @@ suspend fun <T> safeApiCall(apiCall: suspend () -> T): Result<T> {
     return try{
         Result.Success(apiCall())
     } catch (e: Exception) {
+        Log.e("SafeApiCall", "Error during API call", e)
         when(e) {
             is HttpException -> {
                 Result.Error(e.code(), e.message())
             }
             else -> {
-                Result.Error( -1,  "Erro desconhecido")
+                Result.Error( -1,  e.message ?: "Erro desconhecido")
             }
         }
     }
