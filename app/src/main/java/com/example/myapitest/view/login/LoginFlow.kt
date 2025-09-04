@@ -17,7 +17,6 @@ import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.unit.dp
 import androidx.lifecycle.viewmodel.compose.viewModel
 import com.example.myapitest.AuthViewModel
-import com.example.myapitest.view.dashboard.Dashboard
 import com.google.android.gms.auth.api.signin.GoogleSignIn
 import com.google.android.gms.auth.api.signin.GoogleSignInClient
 import com.google.android.gms.common.api.ApiException
@@ -26,10 +25,17 @@ import com.google.android.gms.common.api.ApiException
 fun LoginFlow(
     authViewModel: AuthViewModel = viewModel(),
     googleSignInClient: GoogleSignInClient,
-    activity: Activity
+    activity: Activity,
+    onLoginSuccess: () -> Unit
 ) {
     val user by authViewModel.user.collectAsState()
     val context = LocalContext.current
+
+    LaunchedEffect(user) {
+        if (user != null) {
+            onLoginSuccess()
+        }
+    }
 
     var currentScreen by remember { mutableStateOf("Selection") }
     var phoneNumber by remember { mutableStateOf("") }
@@ -44,7 +50,11 @@ fun LoginFlow(
         try {
             val account = task.getResult(ApiException::class.java)!!
             authViewModel.firebaseAuthWithGoogle(account) { success, message ->
-                Toast.makeText(context, message, Toast.LENGTH_SHORT).show()
+                if (success) {
+                    onLoginSuccess()
+                } else {
+                    Toast.makeText(context, message, Toast.LENGTH_SHORT).show()
+                }
             }
         } catch (e: ApiException) {
             // Tratar falha no login com Google
@@ -96,7 +106,9 @@ fun LoginFlow(
                                     isLoading = true
                                     authViewModel.verifyCode(verificationId!!, verificationCode) { success, error ->
                                         isLoading = false
-                                        if (!success) {
+                                        if (success) {
+                                            onLoginSuccess()
+                                        } else {
                                             Toast.makeText(context, "Erro ao verificar: $error", Toast.LENGTH_LONG).show()
                                         }
                                     }
@@ -107,12 +119,6 @@ fun LoginFlow(
                     }
                 }
             }
-        } else {
-            Dashboard(
-                userInfo = user?.email ?: user?.phoneNumber,
-                onAddClick = { /* TODO: Handle add car */ },
-                onLogoutClick = { authViewModel.signOut(googleSignInClient) {} }
-            )
         }
     }
 }

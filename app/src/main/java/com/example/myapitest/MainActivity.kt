@@ -5,7 +5,13 @@ import androidx.activity.ComponentActivity
 import androidx.activity.compose.setContent
 import androidx.activity.viewModels
 import androidx.compose.material3.MaterialTheme
+import androidx.navigation.compose.NavHost
+import androidx.navigation.compose.composable
+import androidx.navigation.compose.rememberNavController
+import com.example.myapitest.view.addcar.AddCarScreen
+import com.example.myapitest.view.dashboard.Dashboard
 import com.example.myapitest.view.login.LoginFlow
+import com.example.myapitest.viewmodel.CarViewModel
 import com.google.android.gms.auth.api.signin.GoogleSignIn
 import com.google.android.gms.auth.api.signin.GoogleSignInClient
 import com.google.android.gms.auth.api.signin.GoogleSignInOptions
@@ -13,6 +19,7 @@ import com.google.android.gms.auth.api.signin.GoogleSignInOptions
 class MainActivity : ComponentActivity() {
 
     private val authViewModel: AuthViewModel by viewModels()
+    private val carViewModel: CarViewModel by viewModels()
 
     private lateinit var googleSignInClient: GoogleSignInClient
 
@@ -28,11 +35,39 @@ class MainActivity : ComponentActivity() {
 
         setContent {
             MaterialTheme {
-                LoginFlow(
-                    authViewModel = authViewModel,
-                    googleSignInClient = googleSignInClient,
-                    activity = this
-                )
+                val navController = rememberNavController()
+                NavHost(navController = navController, startDestination = "login_flow") {
+                    composable("login_flow") {
+                        LoginFlow(
+                            authViewModel = authViewModel,
+                            googleSignInClient = googleSignInClient,
+                            activity = this@MainActivity,
+                            onLoginSuccess = {
+                                navController.navigate("dashboard") {
+                                    popUpTo("login_flow") { inclusive = true }
+                                }
+                            }
+                        )
+                    }
+                    composable("dashboard") {
+                        Dashboard(
+                            userInfo = authViewModel.getCurrentUser()?.displayName,
+                            onAddClick = { navController.navigate("add_car") },
+                            onLogoutClick = {
+                                authViewModel.logout()
+                                googleSignInClient.signOut().addOnCompleteListener {
+                                    navController.navigate("login_flow") {
+                                        popUpTo("dashboard") { inclusive = true }
+                                    }
+                                }
+                            },
+                            carViewModel = carViewModel
+                        )
+                    }
+                    composable("add_car") {
+                        AddCarScreen(navController = navController, carViewModel = carViewModel)
+                    }
+                }
             }
         }
     }
