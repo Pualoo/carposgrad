@@ -22,6 +22,7 @@ import androidx.compose.ui.layout.ContentScale
 import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.unit.dp
+import androidx.compose.ui.window.Dialog
 import androidx.core.content.ContextCompat
 import androidx.navigation.NavController
 import coil.compose.rememberAsyncImagePainter
@@ -30,7 +31,13 @@ import com.example.myapitest.model.Place
 import com.example.myapitest.viewmodel.CarUIState
 import com.example.myapitest.viewmodel.CarViewModel
 import com.google.android.gms.location.LocationServices
+import com.google.android.gms.maps.model.CameraPosition
+import com.google.android.gms.maps.model.LatLng
 import com.google.firebase.storage.FirebaseStorage
+import com.google.maps.android.compose.GoogleMap
+import com.google.maps.android.compose.Marker
+import com.google.maps.android.compose.rememberCameraPositionState
+import com.google.maps.android.compose.rememberMarkerState
 import java.util.UUID
 
 enum class PermissionState { UNKNOWN, GRANTED, DENIED }
@@ -54,6 +61,8 @@ fun AddCarScreen(navController: NavController, carViewModel: CarViewModel) {
     var locationPermissionState by remember { mutableStateOf(PermissionState.UNKNOWN) }
     var locationError by remember { mutableStateOf<String?>(null) }
     val fusedLocationClient = remember { LocationServices.getFusedLocationProviderClient(context) }
+    var showMap by remember { mutableStateOf(false) }
+    var selectedLocation by remember { mutableStateOf<LatLng?>(null) }
 
     val imagePickerLauncher = rememberLauncherForActivityResult(
         contract = ActivityResultContracts.GetContent()
@@ -91,9 +100,6 @@ fun AddCarScreen(navController: NavController, carViewModel: CarViewModel) {
         contract = ActivityResultContracts.RequestPermission(),
         onResult = { granted ->
             locationPermissionState = if (granted) PermissionState.GRANTED else PermissionState.DENIED
-            if (granted) {
-                // Permission granted, get location
-            }
         }
     )
 
@@ -119,6 +125,38 @@ fun AddCarScreen(navController: NavController, carViewModel: CarViewModel) {
         when (ContextCompat.checkSelfPermission(context, Manifest.permission.ACCESS_FINE_LOCATION)) {
             PackageManager.PERMISSION_GRANTED -> locationPermissionState = PermissionState.GRANTED
             else -> permissionLauncher.launch(Manifest.permission.ACCESS_FINE_LOCATION)
+        }
+    }
+
+    if (showMap) {
+        Dialog(onDismissRequest = { showMap = false }) {
+            Column {
+                val userLocation = lat?.let { lat -> long?.let { long -> LatLng(lat, long) } }
+                val cameraPositionState = rememberCameraPositionState {
+                    position = CameraPosition.fromLatLngZoom(userLocation ?: LatLng(0.0, 0.0), 15f)
+                }
+                val markerState = rememberMarkerState(position = userLocation ?: LatLng(0.0, 0.0))
+
+                GoogleMap(
+                    modifier = Modifier.fillMaxWidth().height(400.dp),
+                    cameraPositionState = cameraPositionState,
+                    onMapClick = {
+                        markerState.position = it
+                    }
+                ) {
+                    Marker(
+                        state = markerState,
+                        title = "Selected Location",
+                        snippet = "This is the selected location"
+                    )
+                }
+                Button(onClick = {
+                    selectedLocation = markerState.position
+                    showMap = false
+                }) {
+                    Text("Confirm Location")
+                }
+            }
         }
     }
 
@@ -222,7 +260,28 @@ fun AddCarScreen(navController: NavController, carViewModel: CarViewModel) {
 
             Spacer(modifier = Modifier.height(16.dp))
 
-            val isFormValid = name.isNotBlank() && year.isNotBlank() && licence.isNotBlank() && lat != null && long != null && imageUrl != null
+            Card(
+                modifier = Modifier.fillMaxWidth(),
+                elevation = CardDefaults.cardElevation(4.dp)
+            ) {
+                Column(
+                    modifier = Modifier.padding(16.dp),
+                    horizontalAlignment = Alignment.CenterHorizontally
+                ) {
+                    Button(onClick = { showMap = true }) {
+                        Text("Select Location")
+                    }
+
+                    selectedLocation?.let {
+                        Spacer(modifier = Modifier.height(8.dp))
+                        Text("Selected Location: Lat: ${it.latitude}, Lng: ${it.longitude}")
+                    }
+                }
+            }
+
+            Spacer(modifier = Modifier.height(16.dp))
+
+            val isFormValid = name.isNotBlank() && year.isNotBlank() && licence.isNotBlank() && selectedLocation != null && imageUrl != null
             Button(
                 onClick = {
                     imageUrl?.let { url ->
@@ -232,7 +291,7 @@ fun AddCarScreen(navController: NavController, carViewModel: CarViewModel) {
                             year = year,
                             name = name,
                             licence = licence,
-                            place = Place(lat = lat ?: 0.0, long = long ?: 0.0)
+                            place = Place(lat = selectedLocation?.latitude ?: 0.0, long = selectedLocation?.longitude ?: 0.0)
                         )
                         carViewModel.addCar(newCarModel) {
                             navController.popBackStack()
