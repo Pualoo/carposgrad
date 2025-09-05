@@ -86,7 +86,7 @@ class MainActivity : ComponentActivity() {
                         backStackEntry.arguments?.getString("car")?.let { carJson ->
                             val decodedUrl = URLDecoder.decode(carJson, "UTF-8")
                             val car = Gson().fromJson(decodedUrl, CarModel::class.java)
-                            MapScreen(car)
+                            MapScreen(car = car, onBackClick = { navController.popBackStack() })
                         }
                     }
                 }
