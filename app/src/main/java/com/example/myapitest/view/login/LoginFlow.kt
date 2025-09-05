@@ -57,7 +57,7 @@ fun LoginFlow(
                 }
             }
         } catch (e: ApiException) {
-            // Tratar falha no login com Google
+            Toast.makeText(context, "Falha no login com Google: ${e.localizedMessage}", Toast.LENGTH_LONG).show()
         }
     }
 
