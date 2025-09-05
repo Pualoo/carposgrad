@@ -1,5 +1,6 @@
 package com.example.myapitest.view.dashboard
 
+import androidx.compose.foundation.clickable
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
@@ -30,6 +31,7 @@ import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.unit.dp
 import androidx.lifecycle.viewmodel.compose.viewModel
+import com.example.myapitest.model.CarModel
 import com.example.myapitest.viewmodel.CarUIState
 import com.example.myapitest.viewmodel.CarViewModel
 
@@ -39,6 +41,7 @@ fun Dashboard(
     userInfo: String?,
     onAddClick: () -> Unit,
     onLogoutClick: () -> Unit,
+    onCarClick: (CarModel) -> Unit,
     carViewModel: CarViewModel = viewModel()
 ) {
     val uiState by carViewModel.uiState.collectAsState()
@@ -81,7 +84,9 @@ fun Dashboard(
                         verticalArrangement = Arrangement.spacedBy(8.dp)
                     ) {
                         items(state.carModels) { car ->
-                            CarItemView(car)
+                            Box(modifier = Modifier.clickable { onCarClick(car) }) {
+                                CarItemView(car)
+                            }
                         }
                     }
                 }
