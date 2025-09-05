@@ -22,6 +22,13 @@ class CarViewModel : ViewModel() {
     private val _uiState = MutableStateFlow<CarUIState>(CarUIState.Loading)
     val uiState: StateFlow<CarUIState> = _uiState
 
+    private val _selectedCar = MutableStateFlow<CarModel?>(null)
+    val selectedCar: StateFlow<CarModel?> = _selectedCar
+
+    fun selectCar(car: CarModel) {
+        _selectedCar.value = car
+    }
+
     fun fetchCars() {
         viewModelScope.launch {
             _uiState.value = CarUIState.Loading

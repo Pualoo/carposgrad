@@ -5,12 +5,9 @@ import androidx.activity.ComponentActivity
 import androidx.activity.compose.setContent
 import androidx.activity.viewModels
 import androidx.compose.material3.MaterialTheme
-import androidx.navigation.NavType
 import androidx.navigation.compose.NavHost
 import androidx.navigation.compose.composable
 import androidx.navigation.compose.rememberNavController
-import androidx.navigation.navArgument
-import com.example.myapitest.model.CarModel
 import com.example.myapitest.view.addcar.AddCarScreen
 import com.example.myapitest.view.dashboard.Dashboard
 import com.example.myapitest.view.login.LoginFlow
@@ -19,9 +16,6 @@ import com.example.myapitest.viewmodel.CarViewModel
 import com.google.android.gms.auth.api.signin.GoogleSignIn
 import com.google.android.gms.auth.api.signin.GoogleSignInClient
 import com.google.android.gms.auth.api.signin.GoogleSignInOptions
-import com.google.gson.Gson
-import java.net.URLDecoder
-import java.net.URLEncoder
 
 class MainActivity : ComponentActivity() {
 
@@ -70,9 +64,8 @@ class MainActivity : ComponentActivity() {
                             },
                             carViewModel = carViewModel,
                             onCarClick = { car ->
-                                val carJson = Gson().toJson(car)
-                                val encodedUrl = URLEncoder.encode(carJson, "UTF-8")
-                                navController.navigate("map_screen/$encodedUrl")
+                                carViewModel.selectCar(car)
+                                navController.navigate("map_screen")
                             }
                         )
                     }
@@ -80,14 +73,9 @@ class MainActivity : ComponentActivity() {
                         AddCarScreen(navController = navController, carViewModel = carViewModel)
                     }
                     composable(
-                        "map_screen/{car}",
-                        arguments = listOf(navArgument("car") { type = NavType.StringType })
-                    ) { backStackEntry ->
-                        backStackEntry.arguments?.getString("car")?.let { carJson ->
-                            val decodedUrl = URLDecoder.decode(carJson, "UTF-8")
-                            val car = Gson().fromJson(decodedUrl, CarModel::class.java)
-                            MapScreen(car = car, onBackClick = { navController.popBackStack() })
-                        }
+                        "map_screen"
+                    ) {
+                        MapScreen(carViewModel = carViewModel, onBackClick = { navController.popBackStack() })
                     }
                 }
             }
