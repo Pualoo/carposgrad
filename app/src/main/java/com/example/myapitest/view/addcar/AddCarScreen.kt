@@ -163,7 +163,7 @@ fun AddCarScreen(navController: NavController, carViewModel: CarViewModel) {
     Scaffold(
         topBar = {
             TopAppBar(
-                title = { Text("Add New Car") },
+                title = { Text("Adicionar novo carro") },
                 colors = TopAppBarDefaults.topAppBarColors(
                     containerColor = MaterialTheme.colorScheme.primary,
                     titleContentColor = MaterialTheme.colorScheme.onPrimary,
@@ -196,21 +196,21 @@ fun AddCarScreen(navController: NavController, carViewModel: CarViewModel) {
                     OutlinedTextField(
                         value = name,
                         onValueChange = { name = it },
-                        label = { Text("Car Name") },
+                        label = { Text("Nome do carro") },
                         modifier = Modifier.fillMaxWidth()
                     )
                     Spacer(modifier = Modifier.height(8.dp))
                     OutlinedTextField(
                         value = year,
                         onValueChange = { year = it },
-                        label = { Text("Year") },
+                        label = { Text("Ano") },
                         modifier = Modifier.fillMaxWidth()
                     )
                     Spacer(modifier = Modifier.height(8.dp))
                     OutlinedTextField(
                         value = licence,
                         onValueChange = { licence = it },
-                        label = { Text("License Plate") },
+                        label = { Text("Placa") },
                         modifier = Modifier.fillMaxWidth()
                     )
                 }
@@ -229,7 +229,7 @@ fun AddCarScreen(navController: NavController, carViewModel: CarViewModel) {
                     if (imageUri != null) {
                         Image(
                             painter = rememberAsyncImagePainter(imageUri),
-                            contentDescription = "Selected Image",
+                            contentDescription = "Selecione a imagem",
                             modifier = Modifier
                                 .height(200.dp)
                                 .fillMaxWidth()
@@ -240,16 +240,16 @@ fun AddCarScreen(navController: NavController, carViewModel: CarViewModel) {
                     }
 
                     Button(onClick = { imagePickerLauncher.launch("image/*") }) {
-                        Text(if (imageUri == null) "Select Image" else "Change Image")
+                        Text(if (imageUri == null) "Selecione a imagem" else "Mude a imagem")
                     }
 
                     when {
                         isImageUploading -> {
                             CircularProgressIndicator(modifier = Modifier.padding(top = 8.dp))
-                            Text("Uploading image...", style = MaterialTheme.typography.bodySmall, color = Color.Gray)
+                            Text("Enviando imagem...", style = MaterialTheme.typography.bodySmall, color = Color.Gray)
                         }
                         imageUploadSuccess -> {
-                            Text("Image uploaded successfully!", style = MaterialTheme.typography.bodyMedium, color = Color(0xFF006400))
+                            Text("Imagem enviada com sucesso!", style = MaterialTheme.typography.bodyMedium, color = Color(0xFF006400))
                         }
                         imageUploadError != null -> {
                             Text(imageUploadError!!, style = MaterialTheme.typography.bodyMedium, color = Color.Red)
@@ -269,12 +269,12 @@ fun AddCarScreen(navController: NavController, carViewModel: CarViewModel) {
                     horizontalAlignment = Alignment.CenterHorizontally
                 ) {
                     Button(onClick = { showMap = true }) {
-                        Text("Select Location")
+                        Text("Selecione a localização")
                     }
 
                     selectedLocation?.let {
                         Spacer(modifier = Modifier.height(8.dp))
-                        Text("Selected Location: Lat: ${it.latitude}, Lng: ${it.longitude}")
+                        Text("Localização: Lat: ${it.latitude}, Lng: ${it.longitude}")
                     }
                 }
             }
@@ -305,7 +305,7 @@ fun AddCarScreen(navController: NavController, carViewModel: CarViewModel) {
             ) {
                 when (uiState) {
                     is CarUIState.Loading -> CircularProgressIndicator(color = Color.White)
-                    else -> Text("Add Car")
+                    else -> Text("Adicionar Carro")
                 }
             }
 
