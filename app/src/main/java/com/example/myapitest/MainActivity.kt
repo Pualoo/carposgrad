@@ -12,6 +12,7 @@ import com.example.myapitest.view.addcar.AddCarScreen
 import com.example.myapitest.view.dashboard.Dashboard
 import com.example.myapitest.view.login.LoginFlow
 import com.example.myapitest.view.map.MapScreen
+import com.example.myapitest.viewmodel.AuthViewModel
 import com.example.myapitest.viewmodel.CarViewModel
 import com.google.android.gms.auth.api.signin.GoogleSignIn
 import com.google.android.gms.auth.api.signin.GoogleSignInClient
