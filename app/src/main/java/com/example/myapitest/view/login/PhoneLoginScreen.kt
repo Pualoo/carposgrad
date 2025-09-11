@@ -42,7 +42,7 @@ fun PhoneInputScreen(
         )
         Spacer(modifier = Modifier.height(16.dp))
         Button(onClick = onSendCodeClick, modifier = Modifier.fillMaxWidth()) {
-            Text("Enviar Código")
+            Text("Enviar Telefone")
         }
         TextButton(onClick = onBack) {
             Text("Voltar")

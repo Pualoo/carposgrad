@@ -101,7 +101,7 @@ fun MapScreen(
                         horizontalArrangement = Arrangement.SpaceAround,
                         verticalAlignment = Alignment.CenterVertically
                     ) {
-                        InfoText(title = "Ano:", value = carModel.year.toString())
+                        InfoText(title = "Ano:", value = carModel.year)
                         InfoText(title = "Placa:", value = carModel.licence)
                     }
                 }
@@ -111,7 +111,8 @@ fun MapScreen(
                         .padding( top = 8.dp)
                         .weight(1f),
                     shape = RoundedCornerShape(topStart = 16.dp, topEnd = 16.dp),
-                    elevation = CardDefaults.cardElevation(defaultElevation = 8.dp)
+                    elevation = CardDefaults.cardElevation(defaultElevation = 8.dp),
+                    colors = CardDefaults.cardColors(containerColor = MaterialTheme.colorScheme.surface)
                 ) {
                     Column(modifier = Modifier.fillMaxSize()) {
                         Text(
@@ -127,6 +128,7 @@ fun MapScreen(
                         ) {
                             GoogleMap(
                                 modifier = Modifier.fillMaxSize(),
+                                uiSettings = com.google.maps.android.compose.MapUiSettings(zoomControlsEnabled = false, zoomGesturesEnabled = false, scrollGesturesEnabled = false, scrollGesturesEnabledDuringRotateOrZoom = false, rotationGesturesEnabled = false, tiltGesturesEnabled = false),
                                 cameraPositionState = rememberCameraPositionState {
                                     position = com.google.android.gms.maps.model.CameraPosition.fromLatLngZoom(
                                         LatLng(carModel.place.lat, carModel.place.long), 15f

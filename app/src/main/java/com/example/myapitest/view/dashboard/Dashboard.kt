@@ -66,7 +66,7 @@ fun Dashboard(
             )
         },
         floatingActionButton = {
-            FloatingActionButton(onClick = onAddClick) {
+            FloatingActionButton(onClick = onAddClick, containerColor = MaterialTheme.colorScheme.primary) {
                 Icon(Icons.Filled.Add, contentDescription = "Add Car")
             }
         }

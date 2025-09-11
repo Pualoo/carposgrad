@@ -4,10 +4,10 @@ import android.os.Bundle
 import androidx.activity.ComponentActivity
 import androidx.activity.compose.setContent
 import androidx.activity.viewModels
-import androidx.compose.material3.MaterialTheme
 import androidx.navigation.compose.NavHost
 import androidx.navigation.compose.composable
 import androidx.navigation.compose.rememberNavController
+import com.example.myapitest.theme.MyApiTestTheme
 import com.example.myapitest.view.addcar.AddCarScreen
 import com.example.myapitest.view.dashboard.Dashboard
 import com.example.myapitest.view.login.LoginFlow
@@ -36,7 +36,7 @@ class MainActivity : ComponentActivity() {
         googleSignInClient = GoogleSignIn.getClient(this, gso)
 
         setContent {
-            MaterialTheme {
+            MyApiTestTheme {
                 val navController = rememberNavController()
                 NavHost(navController = navController, startDestination = "login_flow") {
                     composable("login_flow") {
