@@ -1,3 +1,5 @@
+**ATENÇÃO:** É necessário alterar o arquivo `app/src/main/java/com/example/myapitest/service/RetrofitClient.kt` e atualizar a `BASE_URL` com o link atual do servidor.
+
 # Exercício: Integração de Autenticação e API REST no Aplicativo Android
 
 Este projeto envolve a criação de uma tela de login com o Firebase, integração de uma API REST e a exibição de dados em um aplicativo Android. Siga as instruções abaixo para configurar e implementar as funcionalidades solicitadas.
@@ -62,7 +64,7 @@ Utilize a API do Google Maps para exibir o local (`place`) associado ao carro. E
     - **Firebase**: `Firebase Authentication` e `Firebase Storage`
     - **Retrofit** para a comunicação com a API REST
     - **Picasso** ou outra biblioteca para carregamento de imagens
-    - **Google Maps SDK** 
+    - **Google Maps SDK**
 
 ### Entrega do Exercício
 
